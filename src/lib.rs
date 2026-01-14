@@ -63,6 +63,7 @@
 //! - `serde`: Enable serialization/deserialization of OA structures
 //! - `parallel`: Enable parallel construction using rayon
 //! - `stats`: Enable statistical analysis utilities
+//! - `python`: Enable Python bindings via PyO3
 
 #![warn(missing_docs)]
 #![warn(clippy::all)]
@@ -70,7 +71,10 @@
 #![allow(clippy::module_name_repetitions)]
 
 pub mod builder;
+pub mod catalogue;
 pub mod construct;
+#[cfg(feature = "python")]
+pub mod python;
 pub mod error;
 pub mod gf;
 pub mod oa;
@@ -84,10 +88,11 @@ pub mod prelude {
     pub use crate::builder::{build_oa, OABuilder};
     pub use crate::construct::{
         AddelmanKempthorne, Bose, BoseBush, Bush, Constructor, HadamardPaley, HadamardSylvester,
+        RaoHamming,
     };
     pub use crate::error::{Error, Result};
     pub use crate::gf::{DynamicGf, GaloisField, GfElement};
-    pub use crate::oa::{OA, OAParams};
+    pub use crate::oa::{BalanceReport, OA, OAParams};
 
     #[cfg(feature = "parallel")]
     pub use crate::parallel::{

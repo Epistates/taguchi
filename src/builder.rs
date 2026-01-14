@@ -30,7 +30,9 @@
 //! - **Higher strength**: Bush construction
 //! - **Power-of-2 levels, many factors**: Bose-Bush (when available)
 
-use crate::construct::{AddelmanKempthorne, Bose, BoseBush, Bush, HadamardSylvester};
+use crate::construct::{
+    AddelmanKempthorne, Bose, BoseBush, Bush, Constructor, HadamardSylvester, RaoHamming,
+};
 use crate::error::{Error, Result};
 use crate::oa::OA;
 use crate::utils::factor_prime_power;
@@ -65,7 +67,7 @@ use crate::utils::factor_prime_power;
 /// ```
 #[derive(Debug, Clone, Default)]
 pub struct OABuilder {
-    levels: Option<u32>,
+    levels: Option<Vec<u32>>,
     factors: Option<usize>,
     strength: Option<u32>,
     min_runs: Option<usize>,
@@ -78,21 +80,34 @@ impl OABuilder {
         Self::default()
     }
 
-    /// Set the number of levels (values each factor can take).
-    ///
-    /// Must be at least 2 and should be a prime power for most constructions.
+    /// Set the number of levels for all factors (symmetric OA).
     #[must_use]
     pub fn levels(mut self, levels: u32) -> Self {
-        self.levels = Some(levels);
+        self.levels = Some(vec![levels]);
         self
     }
 
-    /// Set the number of factors (columns in the array).
+    /// Set the number of levels for each factor (mixed-level OA).
+    #[must_use]
+    pub fn mixed_levels(mut self, levels: Vec<u32>) -> Self {
+        self.levels = Some(levels);
+        self.factors = Some(self.levels.as_ref().unwrap().len());
+        self
+    }
+
+    /// Set the number of factors.
     ///
-    /// Must be at least 1.
+    /// For symmetric OAs, this must be set. For mixed-level OAs, this is
+    /// automatically set by `mixed_levels`.
     #[must_use]
     pub fn factors(mut self, factors: usize) -> Self {
         self.factors = Some(factors);
+        if let Some(ref mut lv) = self.levels {
+            if lv.len() == 1 && factors > 1 {
+                let s = lv[0];
+                *lv = vec![s; factors];
+            }
+        }
         self
     }
 
@@ -142,8 +157,9 @@ impl OABuilder {
     /// assert_eq!(oa.runs(), 49);  // Bose: 7²
     /// ```
     pub fn build(self) -> Result<OA> {
-        let levels = self
+        let levels_vec = self
             .levels
+            .clone()
             .ok_or_else(|| Error::invalid_params("levels must be specified"))?;
 
         let factors = self
@@ -154,8 +170,8 @@ impl OABuilder {
         let min_runs = self.min_runs.unwrap_or(0);
 
         // Validate basic constraints
-        if levels < 2 {
-            return Err(Error::invalid_params("levels must be at least 2"));
+        if levels_vec.is_empty() {
+            return Err(Error::invalid_params("levels must not be empty"));
         }
         if factors == 0 {
             return Err(Error::invalid_params("factors must be at least 1"));
@@ -169,8 +185,40 @@ impl OABuilder {
             ));
         }
 
-        // Try to find a suitable construction
-        self.auto_select(levels, factors, strength, min_runs)
+        // Handle symmetric case
+        let is_symmetric = levels_vec.len() == 1 || levels_vec.iter().all(|&s| s == levels_vec[0]);
+        if is_symmetric {
+            let levels = levels_vec[0];
+            return self.auto_select(levels, factors, strength, min_runs);
+        }
+
+        // Handle mixed-level case by finding a suitable base symmetric OA
+        // For now, we look for a prime power q that is a multiple of all s_i
+        let max_s = *levels_vec.iter().max().unwrap();
+        
+        // Try prime powers q starting from max_s up to a reasonable limit
+        for q in max_s..=256 {
+            if crate::utils::is_prime_power(q) && levels_vec.iter().all(|&s| q % s == 0) {
+                // Try to build symmetric OA(N, q^factors, strength)
+                if let Ok(base_oa) = self.auto_select(q, factors, strength, min_runs) {
+                    // Collapse columns to desired levels
+                    let mut mixed_oa = base_oa;
+                    for (i, &s) in levels_vec.iter().enumerate() {
+                        if s < q {
+                            mixed_oa = mixed_oa.collapse_levels(i, s)?;
+                        }
+                    }
+                    return Ok(mixed_oa);
+                }
+            }
+        }
+
+        // No suitable construction found
+        Err(Error::invalid_params(format!(
+            "No construction available for mixed-level OA with levels {:?}. \
+             Try different parameters or a smaller number of factors.",
+            levels_vec
+        )))
     }
 
     /// Automatically select the best construction for the given parameters.
@@ -248,6 +296,28 @@ impl OABuilder {
                                 return Ok(oa);
                             }
                         }
+                    }
+                }
+            }
+
+            // Try Rao-Hamming for any prime power (supports larger N = q^m)
+            if let Some(ref _pf) = prime_power {
+                let q = levels;
+                // Try m = 2, 3, 4, ... until we find enough factors or runs
+                for m in 2..=10 {
+                    let rh_runs = (q as usize).pow(m);
+                    let rh_max_factors = (rh_runs - 1) / (q as usize - 1);
+
+                    if factors <= rh_max_factors && rh_runs >= min_runs {
+                        if let Ok(rh) = RaoHamming::new(q, m) {
+                            if let Ok(oa) = rh.construct(factors) {
+                                return Ok(oa);
+                            }
+                        }
+                    }
+
+                    if rh_runs > 1024 && rh_runs > min_runs {
+                        break;
                     }
                 }
             }
@@ -354,6 +424,18 @@ pub fn available_constructions(levels: u32, strength: u32) -> Vec<(&'static str,
             if pf.prime != 2 {
                 let q = levels;
                 options.push(("AddelmanKempthorne", (2 * q * q) as usize, (2 * q + 1) as usize));
+            }
+        }
+    }
+
+    // Rao-Hamming
+    if strength == 2 {
+        if let Some(ref _pf) = prime_power {
+            let q = levels;
+            for m in 2..=5 {
+                let n = (q as usize).pow(m);
+                let k = (n - 1) / (q as usize - 1);
+                options.push(("RaoHamming", n, k));
             }
         }
     }
@@ -526,7 +608,7 @@ mod tests {
             .build()
             .unwrap();
 
-        assert_eq!(oa.levels(), 2);
+        assert_eq!(oa.symmetric_levels(), 2);
         assert_eq!(oa.factors(), 15);
         assert_eq!(oa.runs(), 16); // Hadamard-Sylvester
 
@@ -535,13 +617,32 @@ mod tests {
     }
 
     #[test]
+    fn test_builder_mixed_levels() {
+        // Construct OA(16, 2^3 4^1, 2)
+        // Base will be OA(16, 4^4, 2)
+        let oa = OABuilder::new()
+            .mixed_levels(vec![2, 2, 2, 4])
+            .strength(2)
+            .build()
+            .unwrap();
+
+        assert_eq!(oa.runs(), 16);
+        assert_eq!(oa.factors(), 4);
+        assert_eq!(oa.levels_vec(), &[2, 2, 2, 4]);
+
+        let result = verify_strength(&oa, 2).unwrap();
+        assert!(result.is_valid, "Mixed OA should be valid: {:?}", result.issues);
+    }
+
+    #[test]
     fn test_available_constructions() {
         let options = available_constructions(3, 2);
 
-        // Should include Bose and Bush
+        // Should include Bose, Bush, and RaoHamming
         let names: Vec<_> = options.iter().map(|(name, _, _)| *name).collect();
         assert!(names.contains(&"Bose"));
         assert!(names.contains(&"Bush"));
+        assert!(names.contains(&"RaoHamming"));
     }
 
     #[test]
@@ -552,5 +653,6 @@ mod tests {
         assert!(names.contains(&"HadamardSylvester"));
         assert!(names.contains(&"BoseBush"));
         assert!(names.contains(&"Bose"));
+        assert!(names.contains(&"RaoHamming"));
     }
 }

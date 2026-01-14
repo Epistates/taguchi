@@ -176,13 +176,21 @@ impl GfTables {
     /// Add two field elements.
     #[must_use]
     pub fn add(&self, a: u32, b: u32) -> u32 {
-        self.add[(a * self.order + b) as usize]
+        if self.characteristic == 2 {
+            a ^ b
+        } else {
+            self.add[(a * self.order + b) as usize]
+        }
     }
 
     /// Subtract two field elements.
     #[must_use]
     pub fn sub(&self, a: u32, b: u32) -> u32 {
-        self.add[(a * self.order + self.neg[b as usize]) as usize]
+        if self.characteristic == 2 {
+            a ^ b
+        } else {
+            self.add[(a * self.order + self.neg[b as usize]) as usize]
+        }
     }
 
     /// Multiply two field elements.

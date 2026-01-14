@@ -60,7 +60,7 @@ pub enum VerificationIssue {
 /// Returns an error if verification encounters an unexpected condition.
 pub fn verify_strength(oa: &OA, strength: u32) -> Result<VerificationResult> {
     let mut issues = Vec::new();
-    let levels = oa.levels();
+    let levels = oa.levels_vec();
     let runs = oa.runs();
     let factors = oa.factors();
 
@@ -68,12 +68,12 @@ pub fn verify_strength(oa: &OA, strength: u32) -> Result<VerificationResult> {
     for row in 0..runs {
         for col in 0..factors {
             let val = oa.get(row, col);
-            if val >= levels {
+            if val >= levels[col] {
                 issues.push(VerificationIssue::ValueOutOfRange {
                     row,
                     col,
                     value: val,
-                    max: levels - 1,
+                    max: levels[col] - 1,
                 });
             }
         }
@@ -96,17 +96,25 @@ pub fn verify_strength(oa: &OA, strength: u32) -> Result<VerificationResult> {
             break;
         }
 
-        let s_to_t = (levels as usize).pow(t);
-        if runs % s_to_t != 0 {
-            // Can't have strength t if N is not divisible by s^t
-            break;
-        }
-
-        let expected_count = runs / s_to_t;
-        let mut balanced = true;
+        let mut balanced_at_t = true;
 
         // Check all C(k, t) combinations of t columns
         for col_combo in combinations(factors, t as usize) {
+            // Calculate s_to_t for this combination
+            let s_to_t: usize = col_combo.iter().map(|&c| levels[c] as usize).product();
+
+            if runs % s_to_t != 0 {
+                // Can't have strength t for this combo if N is not divisible by product of levels
+                balanced_at_t = false;
+                issues.push(VerificationIssue::ImbalancedSubarray {
+                    columns: col_combo,
+                    expected_count: 0, // Placeholder
+                    tuple_counts: HashMap::new(),
+                });
+                continue;
+            }
+
+            let expected_count = runs / s_to_t;
             let mut tuple_counts: HashMap<Vec<u32>, usize> = HashMap::new();
 
             // Count occurrences of each t-tuple
@@ -120,7 +128,7 @@ pub fn verify_strength(oa: &OA, strength: u32) -> Result<VerificationResult> {
             let all_equal = tuple_counts.values().all(|&c| c == expected_count);
 
             if num_tuples != s_to_t || !all_equal {
-                balanced = false;
+                balanced_at_t = false;
                 issues.push(VerificationIssue::ImbalancedSubarray {
                     columns: col_combo,
                     expected_count,
@@ -129,7 +137,7 @@ pub fn verify_strength(oa: &OA, strength: u32) -> Result<VerificationResult> {
             }
         }
 
-        if balanced {
+        if balanced_at_t {
             verified_strength = t;
         } else {
             break;
@@ -217,7 +225,7 @@ mod tests {
     #[test]
     fn test_verify_imbalanced() {
         // Create an array that is NOT balanced
-        let params = OAParams::with_index(4, 3, 2, 2, 1);
+        let params = OAParams::new(4, 3, 2, 2).unwrap();
         let data = Array2::from_shape_vec(
             (4, 3),
             vec![

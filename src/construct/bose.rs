@@ -141,13 +141,27 @@ impl Bose {
                 data[[row, 0]] = j;
 
                 // Columns 1 to factors-1: i + c*j
-                let elem_i = self.field.element(i);
-                let elem_j = self.field.element(j);
-
+                // We want to compute: val[c] = j*c + i for c in 1..factors
+                // This is a linear transform y = a*x + b where:
+                // a = j
+                // b = i
+                // x = c (the column index)
+                
+                // Prepare points (column indices)
+                // In a real optimized scenario, 'points' would be constant and reused
+                // But for now, we just construct it.
+                // Actually, we can just iterate since we have direct access now.
+                
+                let tables = self.field.tables();
                 for c in 1..factors {
-                    let c_elem = self.field.element(c as u32);
-                    let value = elem_i.add(c_elem.mul(elem_j.clone()));
-                    data[[row, c]] = value.to_u32();
+                    // val = i + c*j
+                    // We must map column index c to field element.
+                    // c ranges from 1 to q (inclusive for max factors).
+                    // In GF(q), we take c % q.
+                    // e.g. for q=3: c=1->1, c=2->2, c=3->0
+                    let c_val = (c as u32) % self.q;
+                    let term = tables.mul(c_val, j);
+                    data[[row, c]] = tables.add(i, term);
                 }
             }
         }

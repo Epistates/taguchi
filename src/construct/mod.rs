@@ -41,13 +41,17 @@ mod addelman;
 mod bose;
 mod bose_bush;
 mod bush;
+mod difference_scheme;
 mod hadamard;
+mod rao_hamming;
 
 pub use addelman::AddelmanKempthorne;
 pub use bose::Bose;
 pub use bose_bush::BoseBush;
 pub use bush::Bush;
+pub use difference_scheme::{DifferenceScheme, LinearDifferenceScheme};
 pub use hadamard::{HadamardPaley, HadamardSylvester};
+pub use rao_hamming::RaoHamming;
 
 use crate::error::Result;
 use crate::oa::OA;

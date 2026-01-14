@@ -740,7 +740,7 @@ mod tests {
 
         assert_eq!(oa.runs(), 9);
         assert_eq!(oa.factors(), 4);
-        assert_eq!(oa.levels(), 3);
+        assert_eq!(oa.symmetric_levels(), 3);
 
         let result = verify_strength(&oa, 2).unwrap();
         assert!(result.is_valid, "ParBose L9 should be valid: {:?}", result.issues);
@@ -753,6 +753,7 @@ mod tests {
 
         assert_eq!(oa.runs(), 49);
         assert_eq!(oa.factors(), 8);
+        assert_eq!(oa.symmetric_levels(), 7);
 
         let result = verify_strength(&oa, 2).unwrap();
         assert!(result.is_valid, "ParBose L49 should be valid: {:?}", result.issues);
@@ -766,6 +767,7 @@ mod tests {
         assert_eq!(oa.runs(), 27);
         assert_eq!(oa.factors(), 4);
         assert_eq!(oa.strength(), 3);
+        assert_eq!(oa.symmetric_levels(), 3);
 
         let result = verify_strength(&oa, 3).unwrap();
         assert!(result.is_valid, "ParBush should be valid: {:?}", result.issues);
@@ -778,7 +780,7 @@ mod tests {
 
         assert_eq!(oa.runs(), 18);
         assert_eq!(oa.factors(), 7);
-        assert_eq!(oa.levels(), 3);
+        assert_eq!(oa.symmetric_levels(), 3);
 
         let result = verify_strength(&oa, 2).unwrap();
         assert!(result.is_valid, "ParAddelmanKempthorne L18 should be valid: {:?}", result.issues);
@@ -791,7 +793,7 @@ mod tests {
 
         assert_eq!(oa.runs(), 8);
         assert_eq!(oa.factors(), 7);
-        assert_eq!(oa.levels(), 2);
+        assert_eq!(oa.symmetric_levels(), 2);
 
         let result = verify_strength(&oa, 2).unwrap();
         assert!(result.is_valid, "ParHadamardSylvester should be valid: {:?}", result.issues);
@@ -804,6 +806,7 @@ mod tests {
 
         assert_eq!(oa.runs(), 16);
         assert_eq!(oa.factors(), 15);
+        assert_eq!(oa.symmetric_levels(), 2);
 
         let result = verify_strength(&oa, 2).unwrap();
         assert!(result.is_valid, "ParHadamardSylvester 16 should be valid: {:?}", result.issues);
@@ -812,7 +815,7 @@ mod tests {
     #[test]
     fn test_par_build_oa_binary() {
         let oa = par_build_oa(2, 7, 2).unwrap();
-        assert_eq!(oa.levels(), 2);
+        assert_eq!(oa.symmetric_levels(), 2);
         assert_eq!(oa.factors(), 7);
 
         let result = verify_strength(&oa, 2).unwrap();
@@ -822,7 +825,7 @@ mod tests {
     #[test]
     fn test_par_build_oa_ternary() {
         let oa = par_build_oa(3, 4, 2).unwrap();
-        assert_eq!(oa.levels(), 3);
+        assert_eq!(oa.symmetric_levels(), 3);
         assert_eq!(oa.factors(), 4);
 
         let result = verify_strength(&oa, 2).unwrap();

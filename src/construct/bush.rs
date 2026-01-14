@@ -172,24 +172,41 @@ impl Bush {
         // For column q (if included): contains the leading coefficient a_{t-1}
         // This ensures the array has the full strength t property.
 
+        // Pre-allocate buffer for results
+        let mut results = vec![0u32; factors];
+        // Column indices as points to evaluate
+        let points: Vec<u32> = (0..factors as u32).collect();
+
         for row in 0..runs {
             // Extract polynomial coefficients from row index
-            let coeffs: Vec<u32> = (0..t)
-                .map(|i| ((row as u32) / q.pow(i)) % q)
-                .collect();
+            // ... (keep existing coeff extraction logic or optimize it too)
+            // Actually, let's just optimize the evaluation part first
+            
+            let mut coeffs = Vec::with_capacity(t as usize);
+            let mut temp_row = row as u32;
+            for _ in 0..t {
+                coeffs.push(temp_row % q);
+                temp_row /= q;
+            }
 
-            // Fill columns
-            for col in 0..factors {
-                let value = if (col as u32) < q {
-                    // Columns 0 to q-1: evaluate polynomial at x = col
-                    let x = self.field.element(col as u32);
-                    self.evaluate_polynomial(&coeffs, &x).to_u32()
-                } else {
-                    // Column q: the leading coefficient a_{t-1}
-                    // This represents evaluation at the "point at infinity"
-                    coeffs[t as usize - 1]
-                };
-                data[[row, col]] = value;
+            // Columns 0 to q-1: evaluate polynomial at x = col
+            // For Bush, typically factors <= q+1.
+            // If factors <= q, we just eval at 0..factors
+            
+            // We can use bulk_eval_poly for the first q columns (or all if factors <= q)
+            let eval_count = factors.min(q as usize);
+            
+            self.field.bulk_eval_poly(&coeffs, &points[0..eval_count], &mut results[0..eval_count]);
+            
+            // Copy results to data
+            for col in 0..eval_count {
+                data[[row, col]] = results[col];
+            }
+
+            // Handle the point at infinity if factors > q
+            // Column q: the leading coefficient a_{t-1}
+            if factors > q as usize {
+                data[[row, q as usize]] = coeffs[t as usize - 1];
             }
         }
 
