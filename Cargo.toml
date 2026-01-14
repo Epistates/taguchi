@@ -1,0 +1,57 @@
+[package]
+name = "taguchi"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+authors = ["Nick Paterno"]
+description = "State-of-the-art orthogonal array (Taguchi) library for experimental design"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/nickpaterno/taguchi"
+keywords = ["orthogonal-array", "taguchi", "design-of-experiments", "doe", "statistics"]
+categories = ["science", "mathematics", "algorithms"]
+readme = "README.md"
+
+[features]
+default = []
+
+# Serialization support
+serde = ["dep:serde", "ndarray/serde"]
+
+# Parallel construction with rayon
+parallel = ["dep:rayon", "ndarray/rayon"]
+
+# Extended verification and statistics
+stats = ["dep:ndarray-stats"]
+
+# All optional features
+full = ["serde", "parallel", "stats"]
+
+[dependencies]
+ndarray = "0.16"
+thiserror = "2.0"
+
+# Optional dependencies
+serde = { version = "1.0", features = ["derive"], optional = true }
+rayon = { version = "1.10", optional = true }
+ndarray-stats = { version = "0.6", optional = true }
+
+[dev-dependencies]
+proptest = "1.5"
+criterion = { version = "0.5", features = ["html_reports"] }
+rand = "0.8"
+rand_chacha = "0.3"
+
+[[bench]]
+name = "construction"
+harness = false
+
+[[bench]]
+name = "gf_arithmetic"
+harness = false
+
+[profile.release]
+lto = true
+codegen-units = 1
+
+[profile.bench]
+lto = true
