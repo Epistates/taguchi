@@ -24,7 +24,7 @@ use ndarray::Array2;
 use super::Constructor;
 use crate::error::{Error, Result};
 use crate::gf::DynamicGf;
-use crate::oa::{OA, OAParams};
+use crate::oa::{OAParams, OA};
 use crate::utils::is_prime_power;
 
 /// A Difference Scheme matrix.
@@ -131,11 +131,11 @@ impl DifferenceScheme {
         for c1 in 0..cols {
             for c2 in (c1 + 1)..cols {
                 let mut counts = vec![0; s];
-                
+
                 for r in 0..rows {
                     let v1 = self.data[[r, c1]];
                     let v2 = self.data[[r, c2]];
-                    
+
                     // diff = v1 - v2
                     let diff = tables.sub(v1, v2) as usize;
                     counts[diff] += 1;
@@ -172,23 +172,23 @@ impl DifferenceScheme {
         let c1 = self.data.ncols();
         let r2 = other.data.nrows();
         let c2 = other.data.ncols();
-        
+
         let mut new_data = Array2::zeros((r1 * r2, c1 * c2));
         let tables = self.field.tables();
 
         for i1 in 0..r1 {
             for j1 in 0..c1 {
                 let v1 = self.data[[i1, j1]];
-                
+
                 for i2 in 0..r2 {
                     for j2 in 0..c2 {
                         let v2 = other.data[[i2, j2]];
                         let sum = tables.add(v1, v2);
-                        
+
                         // Map 2D indices to 1D
                         let new_row = i1 * r2 + i2;
                         let new_col = j1 * c2 + j2;
-                        
+
                         new_data[[new_row, new_col]] = sum;
                     }
                 }
@@ -223,7 +223,7 @@ impl DifferenceScheme {
             // For each element `g` in GF(s)
             for g in 0..s {
                 let row_idx = i * s as usize + g as usize;
-                
+
                 // Construct row: d + g
                 for j in 0..c {
                     let val = self.data[[i, j]];
@@ -236,7 +236,7 @@ impl DifferenceScheme {
         // We verify parameters but assume strength 2 for the params struct.
         // If c=1, strength is 1.
         let strength = if c > 1 { 2 } else { 1 };
-        
+
         let params = OAParams::new(runs, c, s, strength)?;
         Ok(OA::new(oa_data, params))
     }
@@ -291,11 +291,11 @@ impl Constructor for LinearDifferenceScheme {
     fn construct(&self, factors: usize) -> Result<OA> {
         // 1. Create linear DS D(q, q, q)
         let ds = DifferenceScheme::linear(self.q)?;
-        
+
         // 2. We can produce up to q+1 factors.
         // q factors from the DS expansion: D_{ik} + g
         // 1 factor from the row index: i
-        
+
         let max_factors = self.max_factors();
         if factors > max_factors {
             return Err(Error::TooManyFactors {
@@ -304,21 +304,21 @@ impl Constructor for LinearDifferenceScheme {
                 algorithm: self.name(),
             });
         }
-        
+
         let r = ds.data.nrows(); // q
         let s = ds.q; // q
         let runs = r * s as usize;
-        
+
         // We will construct the full array first then select (or construct requested directly)
         // Optimization: only construct needed columns
-        
+
         let mut oa_data = Array2::zeros((runs, factors));
         let tables = ds.field.tables();
-        
+
         for i in 0..r {
             for g in 0..s {
                 let row_idx = i * s as usize + g as usize;
-                
+
                 // Fill up to `factors` columns
                 for j in 0..factors {
                     if j < (s as usize) {
@@ -333,7 +333,7 @@ impl Constructor for LinearDifferenceScheme {
                 }
             }
         }
-        
+
         let strength = 2.min(factors as u32);
         let params = OAParams::new(runs, factors, s, strength)?;
         Ok(OA::new(oa_data, params))
@@ -350,7 +350,7 @@ mod tests {
         let ds = DifferenceScheme::linear(3).unwrap();
         assert_eq!(ds.data.nrows(), 3);
         assert_eq!(ds.data.ncols(), 3);
-        
+
         // Check multiplication table structure
         // 0 0 0
         // 0 1 2
@@ -367,21 +367,21 @@ mod tests {
         assert_eq!(oa.runs(), 9);
         assert_eq!(oa.factors(), 3);
         assert_eq!(oa.levels(), 3);
-        
+
         let result = verify_strength(&oa, 2).unwrap();
         assert!(result.is_valid);
     }
-    
+
     #[test]
     fn test_constructor_interface_l9() {
         let cons = LinearDifferenceScheme::new(3).unwrap();
         // Should support 4 factors (3 from DS + 1 index col)
         let oa = cons.construct(4).unwrap();
-        
+
         assert_eq!(oa.runs(), 9);
         assert_eq!(oa.factors(), 4);
         assert_eq!(oa.levels(), 3);
-        
+
         let result = verify_strength(&oa, 2).unwrap();
         assert!(result.is_valid, "L9 from DS should be valid");
     }
@@ -390,7 +390,7 @@ mod tests {
     fn test_ds_verification() {
         let ds = DifferenceScheme::linear(3).unwrap();
         assert!(ds.verify());
-        
+
         // Linear DS already has a zero column at index 0.
         // Adding another one creates duplicates, which fails verification.
         let ds_aug = ds.with_zero_column();
@@ -401,20 +401,20 @@ mod tests {
     fn test_kronecker_sum() {
         let ds1 = DifferenceScheme::linear(2).unwrap(); // D(2, 2, 2)
         let ds2 = DifferenceScheme::linear(2).unwrap();
-        
+
         let ds_kron = ds1.kronecker_sum(&ds2).unwrap();
         // Should be D(4, 4, 2)
         assert_eq!(ds_kron.data.nrows(), 4);
         assert_eq!(ds_kron.data.ncols(), 4);
         assert_eq!(ds_kron.q, 2);
-        
+
         assert!(ds_kron.verify());
-        
+
         // Expansion gives OA(8, 4, 2, 2)
         let oa = ds_kron.to_oa().unwrap();
         assert_eq!(oa.runs(), 8);
         assert_eq!(oa.factors(), 4);
-        
+
         let result = verify_strength(&oa, 2).unwrap();
         assert!(result.is_valid);
     }

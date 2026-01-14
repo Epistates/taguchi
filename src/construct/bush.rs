@@ -42,7 +42,7 @@ use ndarray::Array2;
 use super::Constructor;
 use crate::error::{Error, Result};
 use crate::gf::DynamicGf;
-use crate::oa::{OA, OAParams};
+use crate::oa::{OAParams, OA};
 use crate::utils::is_prime_power;
 
 /// Bush construction for strength-t orthogonal arrays.
@@ -181,7 +181,7 @@ impl Bush {
             // Extract polynomial coefficients from row index
             // ... (keep existing coeff extraction logic or optimize it too)
             // Actually, let's just optimize the evaluation part first
-            
+
             let mut coeffs = Vec::with_capacity(t as usize);
             let mut temp_row = row as u32;
             for _ in 0..t {
@@ -192,12 +192,13 @@ impl Bush {
             // Columns 0 to q-1: evaluate polynomial at x = col
             // For Bush, typically factors <= q+1.
             // If factors <= q, we just eval at 0..factors
-            
+
             // We can use bulk_eval_poly for the first q columns (or all if factors <= q)
             let eval_count = factors.min(q as usize);
-            
-            self.field.bulk_eval_poly(&coeffs, &points[0..eval_count], &mut results[0..eval_count]);
-            
+
+            self.field
+                .bulk_eval_poly(&coeffs, &points[0..eval_count], &mut results[0..eval_count]);
+
             // Copy results to data
             for col in 0..eval_count {
                 data[[row, col]] = results[col];
@@ -214,28 +215,6 @@ impl Bush {
         let actual_strength = t.min(factors as u32);
         let params = OAParams::new(runs, factors, q, actual_strength)?;
         Ok(OA::new(data, params))
-    }
-
-    /// Evaluate a polynomial at a point using Horner's method.
-    ///
-    /// Given coefficients [a_0, a_1, ..., a_{t-1}] and point x,
-    /// computes a_0 + a_1*x + a_2*x^2 + ... + a_{t-1}*x^{t-1}
-    fn evaluate_polynomial(
-        &self,
-        coeffs: &[u32],
-        x: &crate::gf::GfElement,
-    ) -> crate::gf::GfElement {
-        if coeffs.is_empty() {
-            return self.field.zero();
-        }
-
-        // Horner's method: p(x) = a_0 + x*(a_1 + x*(a_2 + ... + x*a_{t-1}))
-        // Process coefficients in reverse order
-        let mut result = self.field.element(coeffs[coeffs.len() - 1]);
-        for &coef in coeffs.iter().rev().skip(1) {
-            result = result.mul(x.clone()).add(self.field.element(coef));
-        }
-        result
     }
 }
 
@@ -285,15 +264,15 @@ mod tests {
 
     #[test]
     fn test_bush_invalid_levels() {
-        assert!(Bush::new(6, 2).is_err());  // 6 not prime power
+        assert!(Bush::new(6, 2).is_err()); // 6 not prime power
         assert!(Bush::new(10, 2).is_err()); // 10 not prime power
     }
 
     #[test]
     fn test_bush_invalid_strength() {
-        assert!(Bush::new(3, 1).is_err());  // strength < 2
-        assert!(Bush::new(3, 4).is_err());  // strength > q
-        assert!(Bush::new(5, 6).is_err());  // strength > q
+        assert!(Bush::new(3, 1).is_err()); // strength < 2
+        assert!(Bush::new(3, 4).is_err()); // strength > q
+        assert!(Bush::new(5, 6).is_err()); // strength > q
     }
 
     #[test]
@@ -308,7 +287,11 @@ mod tests {
         assert_eq!(oa.strength(), 2);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "Bush t=2 should be valid strength-2: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "Bush t=2 should be valid strength-2: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -316,17 +299,25 @@ mod tests {
         let bush = Bush::new(3, 3).unwrap();
         let oa = bush.construct(4).unwrap();
 
-        assert_eq!(oa.runs(), 27);  // 3^3
+        assert_eq!(oa.runs(), 27); // 3^3
         assert_eq!(oa.factors(), 4);
         assert_eq!(oa.levels(), 3);
         assert_eq!(oa.strength(), 3);
 
         // Verify strength 3 (should also pass strength 2)
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "Bush t=3 should be valid strength-2: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "Bush t=3 should be valid strength-2: {:?}",
+            result.issues
+        );
 
         let result = verify_strength(&oa, 3).unwrap();
-        assert!(result.is_valid, "Bush t=3 should be valid strength-3: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "Bush t=3 should be valid strength-3: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -334,13 +325,17 @@ mod tests {
         let bush = Bush::new(5, 3).unwrap();
         let oa = bush.construct(6).unwrap();
 
-        assert_eq!(oa.runs(), 125);  // 5^3
+        assert_eq!(oa.runs(), 125); // 5^3
         assert_eq!(oa.factors(), 6);
         assert_eq!(oa.levels(), 5);
         assert_eq!(oa.strength(), 3);
 
         let result = verify_strength(&oa, 3).unwrap();
-        assert!(result.is_valid, "Bush(5,3) should be valid strength-3: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "Bush(5,3) should be valid strength-3: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -354,7 +349,11 @@ mod tests {
         assert_eq!(oa.strength(), 2);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "Bush(7,2) should be valid strength-2: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "Bush(7,2) should be valid strength-2: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -368,7 +367,11 @@ mod tests {
         assert_eq!(oa.levels(), 4);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "Bush(4,2) should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "Bush(4,2) should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -382,13 +385,17 @@ mod tests {
         assert_eq!(oa.levels(), 8);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "Bush(8,2) should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "Bush(8,2) should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
     fn test_bush_too_many_factors() {
         let bush = Bush::new(3, 3).unwrap();
-        assert!(bush.construct(5).is_err());  // max is 4
+        assert!(bush.construct(5).is_err()); // max is 4
     }
 
     #[test]
@@ -403,7 +410,7 @@ mod tests {
         let oa = bush.construct(1).unwrap();
 
         assert_eq!(oa.factors(), 1);
-        assert_eq!(oa.strength(), 1);  // Can't have strength > factors
+        assert_eq!(oa.strength(), 1); // Can't have strength > factors
 
         // With 1 factor, should contain each value q^(t-1) times
         // 27 rows, 3 levels -> each level appears 9 times

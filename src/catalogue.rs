@@ -4,26 +4,11 @@
 //! using their common names. This is useful for users familiar with Taguchi methods
 //! who want to reference arrays by their standard identifiers.
 
-use crate::construct::{AddelmanKempthorne, Bose, BoseBush, HadamardPaley, HadamardSylvester, Constructor, RaoHamming};
+use crate::construct::{
+    AddelmanKempthorne, Bose, BoseBush, Constructor, HadamardPaley, HadamardSylvester, RaoHamming,
+};
 use crate::error::{Error, Result};
 use crate::oa::OA;
-
-/// A standard Taguchi array definition.
-struct StandardArray {
-    name: &'static str,
-    runs: usize,
-    construct_fn: fn() -> Result<OA>,
-}
-
-impl StandardArray {
-    fn new(name: &'static str, runs: usize, c: fn() -> Result<OA>) -> Self {
-        Self {
-            name,
-            runs,
-            construct_fn: c,
-        }
-    }
-}
 
 /// Retrieve an orthogonal array by its standard Taguchi name.
 ///
@@ -72,14 +57,18 @@ pub fn get_by_name(name: &str) -> Result<OA> {
         "L64" => HadamardSylvester::new(64).and_then(|c| c.construct(63)),
         "L81" => RaoHamming::new(3, 4).and_then(|c| c.construct(40)),
         "L128" => HadamardSylvester::new(128).and_then(|c| c.construct(127)),
-        _ => Err(Error::invalid_params(format!("Unknown standard array: {}", name))),
+        _ => Err(Error::invalid_params(format!(
+            "Unknown standard array: {}",
+            name
+        ))),
     }
 }
 
 /// List all available standard arrays.
 pub fn list_standard_arrays() -> Vec<&'static str> {
     vec![
-        "L4", "L8", "L9", "L12", "L16", "L18", "L25", "L27", "L32", "L49", "L50", "L64", "L81", "L128"
+        "L4", "L8", "L9", "L12", "L16", "L18", "L25", "L27", "L32", "L49", "L50", "L64", "L81",
+        "L128",
     ]
 }
 

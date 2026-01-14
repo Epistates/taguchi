@@ -60,7 +60,6 @@ pub static IRREDUCIBLE_POLYS: &[(u32, u32, &[u32])] = &[
     (2, 7, &[1, 0, 0, 1, 0, 0, 0]),
     // x^8 + x^4 + x^3 + x + 1 (AES polynomial)
     (2, 8, &[1, 1, 0, 1, 1, 0, 0, 0]),
-
     // GF(3^n) - Ternary extension fields
     // x^2 + 1
     (3, 2, &[1, 0]),
@@ -68,21 +67,17 @@ pub static IRREDUCIBLE_POLYS: &[(u32, u32, &[u32])] = &[
     (3, 3, &[1, 2, 0]),
     // x^4 + 2x^3 + 2
     (3, 4, &[2, 0, 0, 2]),
-
     // GF(5^n) - Extension fields over GF(5)
     // x^2 + 2
     (5, 2, &[2, 0]),
     // x^3 + x + 2
     (5, 3, &[2, 1, 0]),
-
     // GF(7^n) - Extension fields over GF(7)
     // x^2 + 1
     (7, 2, &[1, 0]),
-
     // GF(11^n)
     // x^2 + 1
     (11, 2, &[1, 0]),
-
     // GF(13^n)
     // x^2 + 2
     (13, 2, &[2, 0]),
@@ -149,9 +144,9 @@ mod tests {
     #[test]
     fn test_available_orders() {
         let orders = available_field_orders();
-        assert!(orders.contains(&4));   // 2^2
-        assert!(orders.contains(&8));   // 2^3
-        assert!(orders.contains(&9));   // 3^2
+        assert!(orders.contains(&4)); // 2^2
+        assert!(orders.contains(&8)); // 2^3
+        assert!(orders.contains(&9)); // 3^2
         assert!(orders.contains(&256)); // 2^8
     }
 

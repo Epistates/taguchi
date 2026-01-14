@@ -85,7 +85,9 @@ impl<const P: u32> GfPrime<P> {
         if self.value == 0 {
             self
         } else {
-            Self { value: P - self.value }
+            Self {
+                value: P - self.value,
+            }
         }
     }
 
@@ -210,12 +212,17 @@ impl<const P: u32> std::ops::DivAssign for GfPrime<P> {
     }
 }
 
-/// Type aliases for common prime fields
+/// Type alias for GF(2)
 pub type GF2 = GfPrime<2>;
+/// Type alias for GF(3)
 pub type GF3 = GfPrime<3>;
+/// Type alias for GF(5)
 pub type GF5 = GfPrime<5>;
+/// Type alias for GF(7)
 pub type GF7 = GfPrime<7>;
+/// Type alias for GF(11)
 pub type GF11 = GfPrime<11>;
+/// Type alias for GF(13)
 pub type GF13 = GfPrime<13>;
 
 #[cfg(test)]

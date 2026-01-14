@@ -3,8 +3,8 @@
 //! This example demonstrates how to construct and verify orthogonal arrays
 //! using the Bose construction.
 
-use taguchi::construct::{Bose, Constructor};
-use taguchi::oa::verify_strength;
+use taguchi::construct::Bose;
+use taguchi::verify_strength;
 
 fn main() {
     println!("Taguchi Library - Basic Usage Example\n");

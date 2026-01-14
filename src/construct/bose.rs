@@ -35,7 +35,7 @@ use ndarray::Array2;
 use super::Constructor;
 use crate::error::{Error, Result};
 use crate::gf::DynamicGf;
-use crate::oa::{OA, OAParams};
+use crate::oa::{OAParams, OA};
 use crate::utils::is_prime_power;
 
 /// Bose construction for strength-2 orthogonal arrays.
@@ -146,12 +146,12 @@ impl Bose {
                 // a = j
                 // b = i
                 // x = c (the column index)
-                
+
                 // Prepare points (column indices)
                 // In a real optimized scenario, 'points' would be constant and reused
                 // But for now, we just construct it.
                 // Actually, we can just iterate since we have direct access now.
-                
+
                 let tables = self.field.tables();
                 for c in 1..factors {
                     // val = i + c*j
@@ -287,13 +287,17 @@ mod tests {
         assert_eq!(oa.levels(), 4);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "L16(4-level) should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "L16(4-level) should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
     fn test_bose_too_many_factors() {
         let bose = Bose::new(3);
-        assert!(bose.construct(5).is_err());  // max is 4
+        assert!(bose.construct(5).is_err()); // max is 4
     }
 
     #[test]

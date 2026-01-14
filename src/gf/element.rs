@@ -127,7 +127,7 @@ impl DynamicGf {
     /// Panics if `points.len() != results.len()`.
     pub fn bulk_eval_poly(&self, coeffs: &[u32], points: &[u32], results: &mut [u32]) {
         assert_eq!(points.len(), results.len());
-        
+
         if coeffs.is_empty() {
             results.fill(0);
             return;
@@ -155,7 +155,7 @@ impl DynamicGf {
     /// Computes `results[i] = a * points[i] + b` for all i.
     pub fn bulk_linear_transform(&self, a: u32, b: u32, points: &[u32], results: &mut [u32]) {
         assert_eq!(points.len(), results.len());
-        
+
         for i in 0..points.len() {
             let x = points[i];
             let ax = self.tables.mul(a, x);

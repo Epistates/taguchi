@@ -47,7 +47,7 @@ use ndarray::Array2;
 use super::Constructor;
 use crate::error::{Error, Result};
 use crate::gf::DynamicGf;
-use crate::oa::{OA, OAParams};
+use crate::oa::{OAParams, OA};
 use crate::utils::factor_prime_power;
 
 /// Addelman-Kempthorne construction for strength-2 orthogonal arrays.
@@ -193,7 +193,10 @@ impl AddelmanKempthorne {
             // c[m] = m² * (kay - 1) * 4^(-1)
             // = m² * (kay - 1) / 4
             let m_sq = m_elem.clone().mul(m_elem);
-            let c_m = m_sq.mul(kay_minus_one.clone()).mul(four_inv.clone()).to_u32();
+            let c_m = m_sq
+                .mul(kay_minus_one.clone())
+                .mul(four_inv.clone())
+                .to_u32();
             c[m as usize] = c_m;
         }
 
@@ -313,7 +316,9 @@ impl AddelmanKempthorne {
                         let m = col_u32 - q - 1;
                         let m_elem = self.field.element(m);
                         // i² + m*i + j
-                        i_sq.add(m_elem.mul(i_elem.clone())).add(j_elem.clone()).to_u32()
+                        i_sq.add(m_elem.mul(i_elem.clone()))
+                            .add(j_elem.clone())
+                            .to_u32()
                     };
 
                     data[[row, col]] = value;
@@ -356,7 +361,11 @@ impl AddelmanKempthorne {
                         let k_m = self.field.element(self.k[m]);
                         let c_m = self.field.element(self.c[m]);
                         // kay*i² + k[m]*i + j + c[m]
-                        kay_i_sq.add(k_m.mul(i_elem.clone())).add(j_elem.clone()).add(c_m).to_u32()
+                        kay_i_sq
+                            .add(k_m.mul(i_elem.clone()))
+                            .add(j_elem.clone())
+                            .add(c_m)
+                            .to_u32()
                     };
 
                     data[[row, col]] = value;
@@ -481,7 +490,11 @@ mod tests {
         assert_eq!(oa.levels(), 5);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "OA(50,11,5,2) should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "OA(50,11,5,2) should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -494,7 +507,11 @@ mod tests {
         assert_eq!(oa.levels(), 7);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "OA(98,10,7,2) should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "OA(98,10,7,2) should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -507,7 +524,11 @@ mod tests {
         assert_eq!(oa.levels(), 9);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "OA(162,10,9,2) should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "OA(162,10,9,2) should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -520,7 +541,11 @@ mod tests {
         assert_eq!(oa.levels(), 3);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "OA(18,4,3,2) should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "OA(18,4,3,2) should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]

@@ -6,8 +6,8 @@
 use pyo3::prelude::*;
 use pyo3::types::PyList;
 
-use crate::OABuilder;
 use crate::oa::OA;
+use crate::OABuilder;
 
 /// Python wrapper for OAParams
 #[pyclass(name = "OAParams")]
@@ -55,7 +55,7 @@ impl PyOA {
         let data = self.inner.data();
         let rows = data.nrows();
         let cols = data.ncols();
-        
+
         let list = PyList::empty(py);
         for i in 0..rows {
             let row_list = PyList::empty(py);
@@ -66,7 +66,7 @@ impl PyOA {
         }
         Ok(list.into())
     }
-    
+
     /// Check balance.
     fn is_balanced(&self) -> bool {
         let report = self.inner.balance_report();
@@ -84,7 +84,7 @@ fn construct(levels: u32, factors: usize, strength: u32) -> PyResult<PyOA> {
         .strength(strength)
         .build()
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-        
+
     Ok(PyOA { inner: oa })
 }
 
@@ -97,7 +97,7 @@ fn construct_mixed(levels: Vec<u32>, strength: u32) -> PyResult<PyOA> {
         .strength(strength)
         .build()
         .map_err(|e| pyo3::exceptions::PyValueError::new_err(e.to_string()))?;
-        
+
     Ok(PyOA { inner: oa })
 }
 

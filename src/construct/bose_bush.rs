@@ -37,7 +37,7 @@ use ndarray::Array2;
 use super::Constructor;
 use crate::error::{Error, Result};
 use crate::gf::DynamicGf;
-use crate::oa::{OA, OAParams};
+use crate::oa::{OAParams, OA};
 use crate::utils::factor_prime_power;
 
 /// Bose-Bush construction for strength-2 orthogonal arrays.
@@ -314,7 +314,11 @@ mod tests {
         assert_eq!(oa.strength(), 2);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "BoseBush(2) should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "BoseBush(2) should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -327,13 +331,17 @@ mod tests {
         assert_eq!(oa.levels(), 2);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "BoseBush(2) with 3 factors should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "BoseBush(2) with 3 factors should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
     fn test_bose_bush_too_many_factors() {
         let bb = BoseBush::new(2).unwrap();
-        assert!(bb.construct(6).is_err());  // max is 5
+        assert!(bb.construct(6).is_err()); // max is 5
     }
 
     #[test]

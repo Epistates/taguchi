@@ -28,15 +28,18 @@
 //! let prod = a.mul(b);         // 3 * 5 = 15 ≡ 1 (mod 7)
 //! ```
 
-mod prime;
-mod tables;
 mod element;
 mod poly;
+mod prime;
+mod tables;
 
-pub use prime::GfPrime;
-pub use tables::GfTables;
 pub use element::{DynamicGf, GfElement};
-pub use poly::{IrreduciblePoly, IRREDUCIBLE_POLYS};
+pub use poly::{
+    available_field_orders, get_irreducible_poly, has_irreducible_poly, IrreduciblePoly,
+    IRREDUCIBLE_POLYS,
+};
+pub use prime::{GfPrime, GF11, GF13, GF2, GF3, GF5, GF7};
+pub use tables::GfTables;
 
 use std::fmt::Debug;
 use std::hash::Hash;
@@ -56,7 +59,9 @@ use std::hash::Hash;
 /// - **Identity**: a + 0 = a, a * 1 = a
 /// - **Inverse**: a + (-a) = 0, a * a^(-1) = 1 (for a ≠ 0)
 /// - **Distributivity**: a * (b + c) = a * b + a * c
-pub trait GaloisField: Copy + Clone + Eq + PartialEq + Hash + Debug + Default + Send + Sync {
+pub trait GaloisField:
+    Copy + Clone + Eq + PartialEq + Hash + Debug + Default + Send + Sync
+{
     /// The order of the field (number of elements).
     fn order(&self) -> u32;
 

@@ -19,15 +19,15 @@
 //! The defining property is that every N×t subarray contains each possible
 //! t-tuple exactly λ = N/s^t times.
 
-mod verify;
 mod stats;
+mod verify;
 
-pub use verify::{verify_strength, VerificationResult};
 pub use stats::BalanceReport;
+pub use verify::{compute_strength, verify_strength, VerificationResult};
 
 use ndarray::Array2;
-use std::fmt;
 use std::collections::HashMap;
+use std::fmt;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -72,9 +72,9 @@ impl OAParams {
             )));
         }
 
-        let s_to_t = (levels as usize).checked_pow(strength).ok_or_else(|| {
-            Error::invalid_params(format!("{}^{} overflows", levels, strength))
-        })?;
+        let s_to_t = (levels as usize)
+            .checked_pow(strength)
+            .ok_or_else(|| Error::invalid_params(format!("{}^{} overflows", levels, strength)))?;
 
         if runs % s_to_t != 0 {
             return Err(Error::invalid_params(format!(
@@ -172,7 +172,10 @@ impl OAParams {
         // For now, let's at least check that runs is divisible by each individual level.
         for (i, &s) in self.levels.iter().enumerate() {
             if s < 2 {
-                return Err(Error::invalid_params(format!("level for factor {} is < 2", i)));
+                return Err(Error::invalid_params(format!(
+                    "level for factor {} is < 2",
+                    i
+                )));
             }
             if self.runs % (s as usize) != 0 {
                 return Err(Error::invalid_params(format!(
@@ -201,12 +204,18 @@ impl fmt::Display for OAParams {
             }
             let mut levels_sorted: Vec<_> = levels_map.into_iter().collect();
             levels_sorted.sort_by_key(|&(s, _)| s);
-            
+
             let levels_str: Vec<String> = levels_sorted
                 .into_iter()
-                .map(|(s, k)| if k == 1 { s.to_string() } else { format!("{}^{}", s, k) })
+                .map(|(s, k)| {
+                    if k == 1 {
+                        s.to_string()
+                    } else {
+                        format!("{}^{}", s, k)
+                    }
+                })
                 .collect();
-            
+
             write!(
                 f,
                 "OA({}, {}, {}, {})",
@@ -538,11 +547,8 @@ mod tests {
     #[test]
     fn test_oa_creation() {
         let params = OAParams::new(4, 3, 2, 2).unwrap();
-        let data = Array2::from_shape_vec(
-            (4, 3),
-            vec![0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0],
-        )
-        .unwrap();
+        let data =
+            Array2::from_shape_vec((4, 3), vec![0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0]).unwrap();
 
         let oa = OA::new(data, params);
         assert_eq!(oa.runs(), 4);
@@ -553,11 +559,9 @@ mod tests {
     #[test]
     fn test_select_columns() {
         let params = OAParams::new(4, 4, 2, 2).unwrap();
-        let data = Array2::from_shape_vec(
-            (4, 4),
-            vec![0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0],
-        )
-        .unwrap();
+        let data =
+            Array2::from_shape_vec((4, 4), vec![0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0])
+                .unwrap();
 
         let oa = OA::new(data, params);
         let sub = oa.select_columns(&[0, 2]);

@@ -297,9 +297,9 @@ mod tests {
         assert!(is_prime(100003));
 
         // Carmichael numbers (must be correctly identified as composite)
-        assert!(!is_prime(561));   // 3 * 11 * 17
-        assert!(!is_prime(1105));  // 5 * 13 * 17
-        assert!(!is_prime(1729));  // 7 * 13 * 19 (Hardy-Ramanujan number)
+        assert!(!is_prime(561)); // 3 * 11 * 17
+        assert!(!is_prime(1105)); // 5 * 13 * 17
+        assert!(!is_prime(1729)); // 7 * 13 * 19 (Hardy-Ramanujan number)
     }
 
     #[test]
@@ -331,39 +331,57 @@ mod tests {
         // Not prime powers
         assert!(!is_prime_power(0));
         assert!(!is_prime_power(1));
-        assert!(!is_prime_power(6));   // 2 * 3
-        assert!(!is_prime_power(10));  // 2 * 5
-        assert!(!is_prime_power(12));  // 2^2 * 3
-        assert!(!is_prime_power(15));  // 3 * 5
-        assert!(!is_prime_power(18));  // 2 * 3^2
-        assert!(!is_prime_power(20));  // 2^2 * 5
+        assert!(!is_prime_power(6)); // 2 * 3
+        assert!(!is_prime_power(10)); // 2 * 5
+        assert!(!is_prime_power(12)); // 2^2 * 3
+        assert!(!is_prime_power(15)); // 3 * 5
+        assert!(!is_prime_power(18)); // 2 * 3^2
+        assert!(!is_prime_power(20)); // 2^2 * 5
     }
 
     #[test]
     fn test_factor_prime_power() {
         assert_eq!(
             factor_prime_power(8),
-            Some(PrimePowerFactorization { prime: 2, exponent: 3 })
+            Some(PrimePowerFactorization {
+                prime: 2,
+                exponent: 3
+            })
         );
         assert_eq!(
             factor_prime_power(9),
-            Some(PrimePowerFactorization { prime: 3, exponent: 2 })
+            Some(PrimePowerFactorization {
+                prime: 3,
+                exponent: 2
+            })
         );
         assert_eq!(
             factor_prime_power(16),
-            Some(PrimePowerFactorization { prime: 2, exponent: 4 })
+            Some(PrimePowerFactorization {
+                prime: 2,
+                exponent: 4
+            })
         );
         assert_eq!(
             factor_prime_power(27),
-            Some(PrimePowerFactorization { prime: 3, exponent: 3 })
+            Some(PrimePowerFactorization {
+                prime: 3,
+                exponent: 3
+            })
         );
         assert_eq!(
             factor_prime_power(7),
-            Some(PrimePowerFactorization { prime: 7, exponent: 1 })
+            Some(PrimePowerFactorization {
+                prime: 7,
+                exponent: 1
+            })
         );
         assert_eq!(
             factor_prime_power(125),
-            Some(PrimePowerFactorization { prime: 5, exponent: 3 })
+            Some(PrimePowerFactorization {
+                prime: 5,
+                exponent: 3
+            })
         );
 
         // Not prime powers
@@ -389,10 +407,16 @@ mod tests {
 
     #[test]
     fn test_prime_power_factorization_value() {
-        let f = PrimePowerFactorization { prime: 2, exponent: 10 };
+        let f = PrimePowerFactorization {
+            prime: 2,
+            exponent: 10,
+        };
         assert_eq!(f.value(), 1024);
 
-        let f = PrimePowerFactorization { prime: 3, exponent: 5 };
+        let f = PrimePowerFactorization {
+            prime: 3,
+            exponent: 5,
+        };
         assert_eq!(f.value(), 243);
     }
 }

@@ -102,8 +102,8 @@ impl GfTables {
         let n = factorization.exponent;
 
         // Get irreducible polynomial for GF(p^n)
-        let irr_poly = super::poly::get_irreducible_poly(p, n)
-            .ok_or(Error::NoIrreduciblePolynomial(q))?;
+        let irr_poly =
+            super::poly::get_irreducible_poly(p, n).ok_or(Error::NoIrreduciblePolynomial(q))?;
 
         Self::build_extension_tables(p, n, &irr_poly)
     }

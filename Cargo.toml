@@ -7,7 +7,7 @@ authors = ["Nick Paterno"]
 description = "State-of-the-art orthogonal array (Taguchi) library for experimental design"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/nickpaterno/taguchi"
-keywords = ["orthogonal-array", "taguchi", "design-of-experiments", "doe", "statistics"]
+keywords = ["orthogonal-array", "taguchi", "statistics"]
 categories = ["science", "mathematics", "algorithms"]
 readme = "README.md"
 

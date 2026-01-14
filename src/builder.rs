@@ -195,7 +195,7 @@ impl OABuilder {
         // Handle mixed-level case by finding a suitable base symmetric OA
         // For now, we look for a prime power q that is a multiple of all s_i
         let max_s = *levels_vec.iter().max().unwrap();
-        
+
         // Try prime powers q starting from max_s up to a reasonable limit
         for q in max_s..=256 {
             if crate::utils::is_prime_power(q) && levels_vec.iter().all(|&s| q % s == 0) {
@@ -423,7 +423,11 @@ pub fn available_constructions(levels: u32, strength: u32) -> Vec<(&'static str,
         if let Some(ref pf) = prime_power {
             if pf.prime != 2 {
                 let q = levels;
-                options.push(("AddelmanKempthorne", (2 * q * q) as usize, (2 * q + 1) as usize));
+                options.push((
+                    "AddelmanKempthorne",
+                    (2 * q * q) as usize,
+                    (2 * q + 1) as usize,
+                ));
             }
         }
     }
@@ -631,7 +635,11 @@ mod tests {
         assert_eq!(oa.levels_vec(), &[2, 2, 2, 4]);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "Mixed OA should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "Mixed OA should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]

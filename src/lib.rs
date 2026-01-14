@@ -73,11 +73,11 @@
 pub mod builder;
 pub mod catalogue;
 pub mod construct;
-#[cfg(feature = "python")]
-pub mod python;
 pub mod error;
 pub mod gf;
 pub mod oa;
+#[cfg(feature = "python")]
+pub mod python;
 pub mod utils;
 
 #[cfg(feature = "parallel")]
@@ -91,8 +91,12 @@ pub mod prelude {
         RaoHamming,
     };
     pub use crate::error::{Error, Result};
-    pub use crate::gf::{DynamicGf, GaloisField, GfElement};
-    pub use crate::oa::{BalanceReport, OA, OAParams};
+    pub use crate::gf::{
+        available_field_orders, get_irreducible_poly, has_irreducible_poly, DynamicGf, GaloisField,
+        GfElement, GF11, GF13, GF2, GF3, GF5, GF7,
+    };
+    pub use crate::oa::{compute_strength, verify_strength, BalanceReport, OAParams, OA};
+    pub use crate::utils::{factor_prime_power, is_prime, is_prime_power, smallest_prime_factor};
 
     #[cfg(feature = "parallel")]
     pub use crate::parallel::{
@@ -102,7 +106,10 @@ pub mod prelude {
 
 // Re-export commonly used items at crate root
 pub use builder::{available_constructions, build_oa, OABuilder};
+pub use catalogue::get_by_name as get_standard_oa;
 pub use error::{Error, Result};
+pub use oa::{compute_strength, verify_strength};
+pub use utils::{is_prime, is_prime_power};
 
 #[cfg(feature = "parallel")]
 pub use parallel::{par_build_oa, ParAddelmanKempthorne, ParBose, ParBush, ParHadamardSylvester};

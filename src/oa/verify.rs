@@ -173,22 +173,14 @@ pub fn compute_strength(oa: &OA, max_check: u32) -> Result<u32> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ndarray::Array2;
     use crate::oa::OAParams;
+    use ndarray::Array2;
 
     fn make_l4() -> OA {
         // L4(2^3) - standard Taguchi array
         let params = OAParams::new(4, 3, 2, 2).unwrap();
-        let data = Array2::from_shape_vec(
-            (4, 3),
-            vec![
-                0, 0, 0,
-                0, 1, 1,
-                1, 0, 1,
-                1, 1, 0,
-            ],
-        )
-        .unwrap();
+        let data =
+            Array2::from_shape_vec((4, 3), vec![0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0]).unwrap();
         OA::new(data, params)
     }
 
@@ -208,10 +200,8 @@ mod tests {
         let data = Array2::from_shape_vec(
             (4, 3),
             vec![
-                0, 0, 0,
-                0, 1, 2,  // 2 is out of range for levels=2
-                1, 0, 1,
-                1, 1, 0,
+                0, 0, 0, 0, 1, 2, // 2 is out of range for levels=2
+                1, 0, 1, 1, 1, 0,
             ],
         )
         .unwrap();
@@ -229,10 +219,8 @@ mod tests {
         let data = Array2::from_shape_vec(
             (4, 3),
             vec![
-                0, 0, 0,
-                0, 0, 0,  // Duplicate row
-                1, 0, 1,
-                1, 1, 0,
+                0, 0, 0, 0, 0, 0, // Duplicate row
+                1, 0, 1, 1, 1, 0,
             ],
         )
         .unwrap();

@@ -27,7 +27,7 @@ use ndarray::Array2;
 
 use super::Constructor;
 use crate::error::{Error, Result};
-use crate::oa::{OA, OAParams};
+use crate::oa::{OAParams, OA};
 
 /// Sylvester-Hadamard construction for strength-2 binary orthogonal arrays.
 ///
@@ -702,8 +702,7 @@ mod tests {
                 assert!(
                     result.is_valid,
                     "OA(8,{},2,2) should be valid: {:?}",
-                    k,
-                    result.issues
+                    k, result.issues
                 );
             }
         }
@@ -939,8 +938,7 @@ mod tests {
                 assert!(
                     result.is_valid,
                     "Paley OA(12,{},2,2) should be valid: {:?}",
-                    k,
-                    result.issues
+                    k, result.issues
                 );
             }
         }

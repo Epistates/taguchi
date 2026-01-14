@@ -34,7 +34,7 @@ impl OA {
         for col in 0..k {
             let s = self.levels_for(col);
             let expected = n / s as usize;
-            
+
             let mut counts = HashMap::new();
             for row in 0..n {
                 *counts.entry(self.get(row, col)).or_insert(0) += 1;
@@ -126,8 +126,11 @@ impl OA {
     /// Note: This implementation currently only supports symmetric OAs for GWLP.
     #[must_use]
     pub fn gwlp(&self) -> Vec<f64> {
-        assert!(self.params().is_symmetric(), "GWLP currently only supports symmetric OAs");
-        
+        assert!(
+            self.params().is_symmetric(),
+            "GWLP currently only supports symmetric OAs"
+        );
+
         let n = self.runs();
         let k = self.factors();
         let s = self.levels() as f64;
@@ -196,14 +199,13 @@ fn binomial_f64(n: usize, k: usize) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::OABuilder;
 
     #[test]
     fn test_balance_report() {
         let oa = OABuilder::new().levels(3).factors(4).build().unwrap();
         let report = oa.balance_report();
-        
+
         for &balanced in &report.factor_balance {
             assert!(balanced);
         }
@@ -214,12 +216,18 @@ mod tests {
     fn test_correlation_matrix() {
         let oa = OABuilder::new().levels(2).factors(3).build().unwrap();
         let corr = oa.correlation_matrix();
-        
+
         // Strength 2 OA should have zero off-diagonal correlation
         for i in 0..oa.factors() {
             for j in 0..oa.factors() {
                 if i != j {
-                    assert!(corr[[i, j]].abs() < 1e-10, "Corr between {} and {} is {}", i, j, corr[[i, j]]);
+                    assert!(
+                        corr[[i, j]].abs() < 1e-10,
+                        "Corr between {} and {} is {}",
+                        i,
+                        j,
+                        corr[[i, j]]
+                    );
                 } else {
                     assert!((corr[[i, j]] - 1.0).abs() < 1e-10);
                 }
@@ -231,7 +239,7 @@ mod tests {
     fn test_gwlp_l9() {
         let oa = OABuilder::new().levels(3).factors(4).build().unwrap();
         let b = oa.gwlp();
-        
+
         // For strength 2, B1 = B2 = 0
         assert!(b[1].abs() < 1e-10);
         assert!(b[2].abs() < 1e-10);

@@ -5,7 +5,9 @@
 
 mod primality;
 
-pub use primality::{is_prime, is_prime_power, factor_prime_power, PrimePowerFactorization};
+pub use primality::{
+    factor_prime_power, is_prime, is_prime_power, smallest_prime_factor, PrimePowerFactorization,
+};
 
 /// Compute binomial coefficient C(n, k) = n! / (k! * (n-k)!)
 ///
@@ -169,7 +171,8 @@ impl Iterator for CombinationIterator {
             (0, Some(0))
         } else {
             // This is an approximation; exact count would require more computation
-            let count = binomial(self.n as u64, self.k as u64).unwrap_or(usize::MAX as u64) as usize;
+            let count =
+                binomial(self.n as u64, self.k as u64).unwrap_or(usize::MAX as u64) as usize;
             (0, Some(count))
         }
     }

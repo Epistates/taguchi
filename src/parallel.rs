@@ -29,7 +29,7 @@ use rayon::prelude::*;
 use crate::construct::Constructor;
 use crate::error::{Error, Result};
 use crate::gf::DynamicGf;
-use crate::oa::{OA, OAParams};
+use crate::oa::{OAParams, OA};
 use crate::utils::{factor_prime_power, is_prime_power};
 
 /// Parallel Bose construction for strength-2 orthogonal arrays.
@@ -377,7 +377,10 @@ impl ParAddelmanKempthorne {
             b[m as usize] = kay_minus_one.mul(denom_inv).to_u32();
 
             let m_sq = m_elem.clone().mul(m_elem);
-            c[m as usize] = m_sq.mul(kay_minus_one.clone()).mul(four_inv.clone()).to_u32();
+            c[m as usize] = m_sq
+                .mul(kay_minus_one.clone())
+                .mul(four_inv.clone())
+                .to_u32();
         }
 
         Ok(Self {
@@ -406,7 +409,9 @@ impl ParAddelmanKempthorne {
             }
         }
 
-        Err(Error::invalid_params("Failed to find quadratic non-residue"))
+        Err(Error::invalid_params(
+            "Failed to find quadratic non-residue",
+        ))
     }
 
     /// Get the number of levels.
@@ -475,7 +480,9 @@ impl ParAddelmanKempthorne {
                         } else {
                             let m = col_u32 - q - 1;
                             let m_elem = self.field.element(m);
-                            i_sq.add(m_elem.mul(i_elem.clone())).add(j_elem.clone()).to_u32()
+                            i_sq.add(m_elem.mul(i_elem.clone()))
+                                .add(j_elem.clone())
+                                .to_u32()
                         };
                         row.push(value);
                     }
@@ -498,7 +505,11 @@ impl ParAddelmanKempthorne {
                             let m = (col_u32 - q - 1) as usize;
                             let k_m = self.field.element(self.k[m]);
                             let c_m = self.field.element(self.c[m]);
-                            kay_i_sq.add(k_m.mul(i_elem.clone())).add(j_elem.clone()).add(c_m).to_u32()
+                            kay_i_sq
+                                .add(k_m.mul(i_elem.clone()))
+                                .add(j_elem.clone())
+                                .add(c_m)
+                                .to_u32()
                         };
                         row.push(value);
                     }
@@ -743,7 +754,11 @@ mod tests {
         assert_eq!(oa.symmetric_levels(), 3);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "ParBose L9 should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "ParBose L9 should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -756,7 +771,11 @@ mod tests {
         assert_eq!(oa.symmetric_levels(), 7);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "ParBose L49 should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "ParBose L49 should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -770,7 +789,11 @@ mod tests {
         assert_eq!(oa.symmetric_levels(), 3);
 
         let result = verify_strength(&oa, 3).unwrap();
-        assert!(result.is_valid, "ParBush should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "ParBush should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -783,7 +806,11 @@ mod tests {
         assert_eq!(oa.symmetric_levels(), 3);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "ParAddelmanKempthorne L18 should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "ParAddelmanKempthorne L18 should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -796,7 +823,11 @@ mod tests {
         assert_eq!(oa.symmetric_levels(), 2);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "ParHadamardSylvester should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "ParHadamardSylvester should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
@@ -809,7 +840,11 @@ mod tests {
         assert_eq!(oa.symmetric_levels(), 2);
 
         let result = verify_strength(&oa, 2).unwrap();
-        assert!(result.is_valid, "ParHadamardSylvester 16 should be valid: {:?}", result.issues);
+        assert!(
+            result.is_valid,
+            "ParHadamardSylvester 16 should be valid: {:?}",
+            result.issues
+        );
     }
 
     #[test]
