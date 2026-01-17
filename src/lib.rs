@@ -73,6 +73,8 @@
 pub mod builder;
 pub mod catalogue;
 pub mod construct;
+#[cfg(feature = "doe")]
+pub mod doe;
 pub mod error;
 pub mod gf;
 pub mod oa;
@@ -101,6 +103,12 @@ pub mod prelude {
     #[cfg(feature = "parallel")]
     pub use crate::parallel::{
         par_build_oa, ParAddelmanKempthorne, ParBose, ParBush, ParHadamardSylvester,
+    };
+
+    #[cfg(feature = "doe")]
+    pub use crate::doe::{
+        analyze, ANOVAConfig, ANOVAEntry, ANOVAResult, AnalysisConfig, ConfidenceInterval,
+        DOEAnalysis, MainEffect, OptimalSettings, OptimizationType, SNRatioEffect,
     };
 }
 

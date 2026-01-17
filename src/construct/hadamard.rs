@@ -34,8 +34,8 @@ use crate::oa::{OAParams, OA};
 /// Produces OA(n, k, 2, 2) where n = 2^m for some m ≥ 2, and k ≤ n-1.
 ///
 /// The Sylvester construction builds Hadamard matrices recursively:
-/// - H₁ = [1]
-/// - H_{2n} = [[H_n, H_n], [H_n, -H_n]]
+/// - H₁ = \[1\]
+/// - H_{2n} = \[\[H_n, H_n\], \[H_n, -H_n\]\]
 ///
 /// This is the most efficient construction for binary OAs when the number
 /// of runs is a power of 2.

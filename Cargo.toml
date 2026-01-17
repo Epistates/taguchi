@@ -1,8 +1,8 @@
 [package]
 name = "taguchi"
-version = "0.1.0"
-edition = "2021"
-rust-version = "1.75"
+version = "0.2.0"
+edition = "2024"
+rust-version = "1.85"
 authors = ["Nick Paterno"]
 description = "State-of-the-art orthogonal array (Taguchi) library for experimental design"
 license = "MIT OR Apache-2.0"
@@ -23,11 +23,14 @@ parallel = ["dep:rayon", "ndarray/rayon"]
 # Extended verification and statistics
 stats = []
 
+# DOE analysis (main effects, S/N ratios, ANOVA, optimal prediction)
+doe = []
+
 # Python bindings
 python = ["dep:pyo3"]
 
 # All optional features
-full = ["serde", "parallel", "stats", "python"]
+full = ["serde", "parallel", "stats", "doe", "python"]
 
 [dependencies]
 ndarray = "0.16"

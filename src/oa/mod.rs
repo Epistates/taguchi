@@ -232,7 +232,7 @@ impl fmt::Display for OAParams {
 ///
 /// This is the main data structure representing an orthogonal array.
 /// The array data is stored as a 2D matrix of integers where each
-/// column j has elements in the range [0, levels[j]).
+/// column j has elements in the range `[0, levels[j])`.
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct OA {

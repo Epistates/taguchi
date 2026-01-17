@@ -13,6 +13,7 @@
 - **Custom Galois Field Arithmetic**: Full control over $GF(q)$ arithmetic for both prime and extension fields with zero dependencies.
 - **Statistical Analysis**: Built-in utilities for balance checking, correlation analysis, and Generalized Word Length Pattern (GWLP).
 - **Parallel Construction**: High-performance row generation using `rayon` for large-scale experimental designs.
+- **DOE Analysis**: Complete Taguchi analysis with main effects, S/N ratios, ANOVA, and optimal settings prediction.
 - **Modern API**: Fluent builder pattern with automatic optimal construction selection.
 
 ## Quick Start
@@ -65,16 +66,71 @@ assert_eq!(l9.runs(), 9);
 assert_eq!(l9.factors(), 4);
 ```
 
+## DOE Analysis
+
+Analyze experimental results with the `doe` feature:
+
+```toml
+[dependencies]
+taguchi = { version = "0.2", features = ["doe"] }
+```
+
+```rust
+use taguchi::OABuilder;
+use taguchi::doe::{analyze, AnalysisConfig, OptimizationType};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Create L9 orthogonal array
+    let oa = OABuilder::new()
+        .levels(3)
+        .factors(4)
+        .strength(2)
+        .build()?;
+
+    // Experimental response data (9 runs)
+    let response_data = vec![
+        vec![85.0], vec![92.0], vec![78.0],
+        vec![91.0], vec![88.0], vec![82.0],
+        vec![89.0], vec![86.0], vec![94.0],
+    ];
+
+    // Run Taguchi analysis
+    let config = AnalysisConfig {
+        optimization_type: OptimizationType::LargerIsBetter,
+        confidence_level: 0.95,
+        ..Default::default()
+    };
+
+    let result = analyze(&oa, &response_data, &config)?;
+
+    println!("Grand mean: {:.2}", result.grand_mean);
+    println!("Optimal levels: {:?}", result.optimal_settings.factor_levels);
+    println!("Predicted mean: {:.2}", result.optimal_settings.predicted_mean);
+
+    // ANOVA results
+    for entry in &result.anova.entries {
+        if !entry.pooled {
+            println!("Factor {}: SS={:.2}, F={:.2}, p={:.4}",
+                entry.factor_index,
+                entry.sum_of_squares,
+                entry.f_ratio.unwrap_or(0.0),
+                entry.p_value.unwrap_or(1.0));
+        }
+    }
+    Ok(())
+}
+```
+
 ## Performance
 
-Taguchi uses precomputed arithmetic tables for small fields and optimized `ndarray` storage. 
+Taguchi uses precomputed arithmetic tables for small fields and optimized `ndarray` storage.
 Recent optimizations include batch polynomial evaluation and direct table access, yielding **~10x speedups** for common constructions.
 
 For massive arrays, enable the `parallel` feature:
 
 ```toml
 [dependencies]
-taguchi = { version = "0.1", features = ["parallel"] }
+taguchi = { version = "0.2", features = ["parallel"] }
 ```
 
 ## Mathematical Background
