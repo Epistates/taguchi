@@ -37,7 +37,7 @@ use ndarray::Array2;
 use super::Constructor;
 use crate::error::{Error, Result};
 use crate::gf::DynamicGf;
-use crate::oa::{OAParams, OA};
+use crate::oa::{OA, OAParams};
 use crate::utils::factor_prime_power;
 
 /// Bose-Bush construction for strength-2 orthogonal arrays.

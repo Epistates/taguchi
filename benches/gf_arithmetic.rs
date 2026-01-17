@@ -1,6 +1,6 @@
 //! Benchmarks for Galois field arithmetic.
 
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
+use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use taguchi::gf::DynamicGf;
 
 fn bench_gf_multiplication(c: &mut Criterion) {

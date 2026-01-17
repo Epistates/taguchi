@@ -23,7 +23,7 @@ mod stats;
 mod verify;
 
 pub use stats::BalanceReport;
-pub use verify::{compute_strength, verify_strength, VerificationResult};
+pub use verify::{VerificationResult, compute_strength, verify_strength};
 
 use ndarray::Array2;
 use std::collections::HashMap;

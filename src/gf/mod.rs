@@ -35,10 +35,10 @@ mod tables;
 
 pub use element::{DynamicGf, GfElement};
 pub use poly::{
-    available_field_orders, get_irreducible_poly, has_irreducible_poly, IrreduciblePoly,
-    IRREDUCIBLE_POLYS,
+    IRREDUCIBLE_POLYS, IrreduciblePoly, available_field_orders, get_irreducible_poly,
+    has_irreducible_poly,
 };
-pub use prime::{GfPrime, GF11, GF13, GF2, GF3, GF5, GF7};
+pub use prime::{GF2, GF3, GF5, GF7, GF11, GF13, GfPrime};
 pub use tables::GfTables;
 
 use std::fmt::Debug;

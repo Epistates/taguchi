@@ -87,37 +87,37 @@ pub mod parallel;
 
 /// Prelude module for convenient imports.
 pub mod prelude {
-    pub use crate::builder::{build_oa, OABuilder};
+    pub use crate::builder::{OABuilder, build_oa};
     pub use crate::construct::{
         AddelmanKempthorne, Bose, BoseBush, Bush, Constructor, HadamardPaley, HadamardSylvester,
         RaoHamming,
     };
     pub use crate::error::{Error, Result};
     pub use crate::gf::{
-        available_field_orders, get_irreducible_poly, has_irreducible_poly, DynamicGf, GaloisField,
-        GfElement, GF11, GF13, GF2, GF3, GF5, GF7,
+        DynamicGf, GF2, GF3, GF5, GF7, GF11, GF13, GaloisField, GfElement, available_field_orders,
+        get_irreducible_poly, has_irreducible_poly,
     };
-    pub use crate::oa::{compute_strength, verify_strength, BalanceReport, OAParams, OA};
+    pub use crate::oa::{BalanceReport, OA, OAParams, compute_strength, verify_strength};
     pub use crate::utils::{factor_prime_power, is_prime, is_prime_power, smallest_prime_factor};
 
     #[cfg(feature = "parallel")]
     pub use crate::parallel::{
-        par_build_oa, ParAddelmanKempthorne, ParBose, ParBush, ParHadamardSylvester,
+        ParAddelmanKempthorne, ParBose, ParBush, ParHadamardSylvester, par_build_oa,
     };
 
     #[cfg(feature = "doe")]
     pub use crate::doe::{
-        analyze, ANOVAConfig, ANOVAEntry, ANOVAResult, AnalysisConfig, ConfidenceInterval,
-        DOEAnalysis, MainEffect, OptimalSettings, OptimizationType, SNRatioEffect,
+        ANOVAConfig, ANOVAEntry, ANOVAResult, AnalysisConfig, ConfidenceInterval, DOEAnalysis,
+        MainEffect, OptimalSettings, OptimizationType, SNRatioEffect, analyze,
     };
 }
 
 // Re-export commonly used items at crate root
-pub use builder::{available_constructions, build_oa, OABuilder};
+pub use builder::{OABuilder, available_constructions, build_oa};
 pub use catalogue::get_by_name as get_standard_oa;
 pub use error::{Error, Result};
 pub use oa::{compute_strength, verify_strength};
 pub use utils::{is_prime, is_prime_power};
 
 #[cfg(feature = "parallel")]
-pub use parallel::{par_build_oa, ParAddelmanKempthorne, ParBose, ParBush, ParHadamardSylvester};
+pub use parallel::{ParAddelmanKempthorne, ParBose, ParBush, ParHadamardSylvester, par_build_oa};

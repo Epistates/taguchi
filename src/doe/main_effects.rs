@@ -37,7 +37,12 @@ pub fn calculate_main_effects(
     for factor_idx in 0..num_factors {
         // Determine number of levels for this factor
         let column = array_data.column(factor_idx);
-        let num_levels = column.iter().copied().max().map(|m| m as usize + 1).unwrap_or(0);
+        let num_levels = column
+            .iter()
+            .copied()
+            .max()
+            .map(|m| m as usize + 1)
+            .unwrap_or(0);
 
         if num_levels == 0 {
             continue;
@@ -72,10 +77,7 @@ pub fn calculate_main_effects(
         let level_effects: Vec<f64> = level_means.iter().map(|m| m - grand_mean).collect();
 
         // Calculate range (max - min)
-        let min_mean = level_means
-            .iter()
-            .copied()
-            .fold(f64::INFINITY, f64::min);
+        let min_mean = level_means.iter().copied().fold(f64::INFINITY, f64::min);
         let max_mean = level_means
             .iter()
             .copied()
@@ -147,12 +149,7 @@ mod tests {
     #[test]
     fn test_main_effects_two_level() {
         // Simple 2-level, 3-factor design
-        let array_data: Array2<u32> = array![
-            [0, 0, 0],
-            [0, 1, 1],
-            [1, 0, 1],
-            [1, 1, 0],
-        ];
+        let array_data: Array2<u32> = array![[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0],];
 
         let responses = vec![10.0, 20.0, 15.0, 25.0];
         let grand_mean = 17.5;
@@ -175,12 +172,7 @@ mod tests {
     #[test]
     fn test_main_effects_ranking() {
         // Design where factor 1 has the largest effect
-        let array_data: Array2<u32> = array![
-            [0, 0],
-            [0, 1],
-            [1, 0],
-            [1, 1],
-        ];
+        let array_data: Array2<u32> = array![[0, 0], [0, 1], [1, 0], [1, 1],];
 
         // Factor 0: effect = 1, Factor 1: effect = 10
         let responses = vec![10.0, 20.0, 11.0, 21.0];
@@ -196,12 +188,7 @@ mod tests {
 
     #[test]
     fn test_main_effects_level_effects() {
-        let array_data: Array2<u32> = array![
-            [0, 0],
-            [0, 1],
-            [1, 0],
-            [1, 1],
-        ];
+        let array_data: Array2<u32> = array![[0, 0], [0, 1], [1, 0], [1, 1],];
 
         let responses = vec![10.0, 20.0, 30.0, 40.0];
         let grand_mean = 25.0;

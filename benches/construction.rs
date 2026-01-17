@@ -1,6 +1,6 @@
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
-use taguchi::construct::{Bose, Bush, Constructor, RaoHamming};
+use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use taguchi::OABuilder;
+use taguchi::construct::{Bose, Bush, Constructor, RaoHamming};
 
 fn bench_bose(c: &mut Criterion) {
     let mut group = c.benchmark_group("Bose");

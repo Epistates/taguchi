@@ -62,10 +62,7 @@ pub fn calculate_anova(
     let num_runs = array_data.nrows();
 
     // Total Sum of Squares
-    let total_ss: f64 = run_averages
-        .iter()
-        .map(|y| (y - grand_mean).powi(2))
-        .sum();
+    let total_ss: f64 = run_averages.iter().map(|y| (y - grand_mean).powi(2)).sum();
     let total_df = num_runs - 1;
 
     // Calculate SS and DF for each factor
@@ -74,7 +71,12 @@ pub fn calculate_anova(
 
     for factor_idx in 0..num_factors {
         let column = array_data.column(factor_idx);
-        let num_levels = column.iter().copied().max().map(|m| m as usize + 1).unwrap_or(0);
+        let num_levels = column
+            .iter()
+            .copied()
+            .max()
+            .map(|m| m as usize + 1)
+            .unwrap_or(0);
 
         if num_levels == 0 {
             factor_ss.push(0.0);
@@ -262,12 +264,7 @@ mod tests {
 
     #[test]
     fn test_anova_basic() {
-        let array_data: Array2<u32> = array![
-            [0, 0],
-            [0, 1],
-            [1, 0],
-            [1, 1],
-        ];
+        let array_data: Array2<u32> = array![[0, 0], [0, 1], [1, 0], [1, 1],];
 
         let responses = vec![10.0, 20.0, 30.0, 40.0];
         let grand_mean = 25.0;
@@ -289,12 +286,7 @@ mod tests {
 
     #[test]
     fn test_anova_with_replicates() {
-        let array_data: Array2<u32> = array![
-            [0, 0],
-            [0, 1],
-            [1, 0],
-            [1, 1],
-        ];
+        let array_data: Array2<u32> = array![[0, 0], [0, 1], [1, 0], [1, 1],];
 
         let response_data = vec![
             vec![10.0, 11.0, 12.0],
@@ -310,7 +302,13 @@ mod tests {
         let grand_mean = run_averages.iter().sum::<f64>() / run_averages.len() as f64;
 
         let config = ANOVAConfig::default();
-        let anova = calculate_anova(&array_data, &run_averages, &response_data, grand_mean, &config);
+        let anova = calculate_anova(
+            &array_data,
+            &run_averages,
+            &response_data,
+            grand_mean,
+            &config,
+        );
 
         // Should have pure error from replicates
         // 4 runs × 2 df per run = 8 error df
@@ -323,12 +321,7 @@ mod tests {
 
     #[test]
     fn test_anova_pooling() {
-        let array_data: Array2<u32> = array![
-            [0, 0, 0],
-            [0, 1, 1],
-            [1, 0, 1],
-            [1, 1, 0],
-        ];
+        let array_data: Array2<u32> = array![[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0],];
 
         // Design data where:
         // Factor 0 has small effect (values: 10.0, 50.0 vs 10.1, 50.1 -> effect = 0.1)
@@ -348,20 +341,21 @@ mod tests {
 
         // At least one factor should remain unpooled (the significant one)
         let unpooled_count = anova.entries.iter().filter(|e| !e.pooled).count();
-        assert!(unpooled_count >= 1, "At least one factor should be unpooled");
+        assert!(
+            unpooled_count >= 1,
+            "At least one factor should be unpooled"
+        );
 
         // Factor 1 should have the largest effect and NOT be pooled
-        assert!(!anova.entries[1].pooled, "Factor 1 (large effect) should not be pooled");
+        assert!(
+            !anova.entries[1].pooled,
+            "Factor 1 (large effect) should not be pooled"
+        );
     }
 
     #[test]
     fn test_anova_min_unpooled() {
-        let array_data: Array2<u32> = array![
-            [0, 0],
-            [0, 1],
-            [1, 0],
-            [1, 1],
-        ];
+        let array_data: Array2<u32> = array![[0, 0], [0, 1], [1, 0], [1, 1],];
 
         // All factors have very small effects
         let responses = vec![10.0, 10.1, 10.2, 10.3];
@@ -383,12 +377,7 @@ mod tests {
 
     #[test]
     fn test_anova_contribution_percent() {
-        let array_data: Array2<u32> = array![
-            [0, 0],
-            [0, 1],
-            [1, 0],
-            [1, 1],
-        ];
+        let array_data: Array2<u32> = array![[0, 0], [0, 1], [1, 0], [1, 1],];
 
         let responses = vec![10.0, 20.0, 30.0, 40.0];
         let grand_mean = 25.0;
@@ -408,12 +397,7 @@ mod tests {
 
     #[test]
     fn test_anova_f_ratios() {
-        let array_data: Array2<u32> = array![
-            [0, 0],
-            [0, 1],
-            [1, 0],
-            [1, 1],
-        ];
+        let array_data: Array2<u32> = array![[0, 0], [0, 1], [1, 0], [1, 1],];
 
         let response_data = vec![
             vec![10.0, 11.0],
@@ -433,7 +417,13 @@ mod tests {
             ..Default::default()
         };
 
-        let anova = calculate_anova(&array_data, &run_averages, &response_data, grand_mean, &config);
+        let anova = calculate_anova(
+            &array_data,
+            &run_averages,
+            &response_data,
+            grand_mean,
+            &config,
+        );
 
         // All non-pooled factors should have F-ratios
         for entry in &anova.entries {

@@ -41,11 +41,7 @@ pub fn calculate_sn_ratio(
         OptimizationType::LargerIsBetter => {
             // η = -10 * log₁₀(Σ(1/y²)/n)
             // Filter out zeros to avoid division by zero
-            let valid_values: Vec<f64> = values
-                .iter()
-                .filter(|&&v| v != 0.0)
-                .copied()
-                .collect();
+            let valid_values: Vec<f64> = values.iter().filter(|&&v| v != 0.0).copied().collect();
 
             if valid_values.is_empty() {
                 // All zeros - worst case for larger-is-better
@@ -73,10 +69,7 @@ pub fn calculate_sn_ratio(
             let target = target_value.unwrap_or(mean);
 
             // Calculate variance around target
-            let variance: f64 = values
-                .iter()
-                .map(|v| (v - target).powi(2))
-                .sum::<f64>() / n;
+            let variance: f64 = values.iter().map(|v| (v - target).powi(2)).sum::<f64>() / n;
 
             if variance == 0.0 {
                 // Perfect - all values equal target
@@ -131,7 +124,12 @@ pub fn calculate_sn_ratios(
 
     for factor_idx in 0..num_factors {
         let column = array_data.column(factor_idx);
-        let num_levels = column.iter().copied().max().map(|m| m as usize + 1).unwrap_or(0);
+        let num_levels = column
+            .iter()
+            .copied()
+            .max()
+            .map(|m| m as usize + 1)
+            .unwrap_or(0);
 
         if num_levels == 0 {
             continue;
@@ -153,13 +151,11 @@ pub fn calculate_sn_ratios(
         let level_sn_ratios: Vec<f64> = level_sn_sums
             .iter()
             .zip(level_counts.iter())
-            .map(|(&sum, &count)| {
-                if count > 0 {
-                    sum / count as f64
-                } else {
-                    0.0
-                }
-            })
+            .map(
+                |(&sum, &count)| {
+                    if count > 0 { sum / count as f64 } else { 0.0 }
+                },
+            )
             .collect();
 
         // Find optimal level (highest S/N ratio)
@@ -260,19 +256,9 @@ mod tests {
 
     #[test]
     fn test_sn_ratios_l4() {
-        let array_data: Array2<u32> = array![
-            [0, 0],
-            [0, 1],
-            [1, 0],
-            [1, 1],
-        ];
+        let array_data: Array2<u32> = array![[0, 0], [0, 1], [1, 0], [1, 1],];
 
-        let response_data = vec![
-            vec![10.0],
-            vec![20.0],
-            vec![30.0],
-            vec![40.0],
-        ];
+        let response_data = vec![vec![10.0], vec![20.0], vec![30.0], vec![40.0]];
 
         let effects = calculate_sn_ratios(
             &array_data,
@@ -295,18 +281,10 @@ mod tests {
 
     #[test]
     fn test_sn_grand_mean() {
-        let response_data = vec![
-            vec![10.0],
-            vec![20.0],
-            vec![30.0],
-            vec![40.0],
-        ];
+        let response_data = vec![vec![10.0], vec![20.0], vec![30.0], vec![40.0]];
 
-        let grand_mean = calculate_sn_grand_mean(
-            &response_data,
-            &OptimizationType::LargerIsBetter,
-            None,
-        );
+        let grand_mean =
+            calculate_sn_grand_mean(&response_data, &OptimizationType::LargerIsBetter, None);
 
         // Calculate individual S/N ratios and average
         let sn1 = calculate_sn_ratio(&[10.0], &OptimizationType::LargerIsBetter, None);

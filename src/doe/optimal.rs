@@ -32,10 +32,7 @@ pub fn predict_optimal(
     confidence_level: f64,
 ) -> OptimalSettings {
     // Find optimal level for each factor (from S/N analysis)
-    let factor_levels: Vec<usize> = sn_ratio_effects
-        .iter()
-        .map(|e| e.optimal_level)
-        .collect();
+    let factor_levels: Vec<usize> = sn_ratio_effects.iter().map(|e| e.optimal_level).collect();
 
     // Calculate predicted mean using additive model:
     // ŷ = grand_mean + Σ(effect_at_optimal_level)
@@ -278,15 +275,7 @@ mod tests {
         let sn_effects = create_test_sn_effects();
         let anova = create_test_anova();
 
-        let optimal = predict_optimal(
-            &main_effects,
-            &sn_effects,
-            20.0,
-            28.0,
-            &anova,
-            9,
-            0.95,
-        );
+        let optimal = predict_optimal(&main_effects, &sn_effects, 20.0, 28.0, &anova, 9, 0.95);
 
         let ci = optimal.confidence_interval.expect("Should have CI");
 
@@ -316,15 +305,7 @@ mod tests {
             total_df: 8,
         };
 
-        let optimal = predict_optimal(
-            &main_effects,
-            &sn_effects,
-            20.0,
-            28.0,
-            &anova,
-            9,
-            0.95,
-        );
+        let optimal = predict_optimal(&main_effects, &sn_effects, 20.0, 28.0, &anova, 9, 0.95);
 
         // Should not have CI when no error
         assert!(optimal.confidence_interval.is_none());
@@ -362,8 +343,8 @@ mod tests {
             + sn_effects
                 .iter()
                 .map(|e| {
-                    let factor_mean = e.level_sn_ratios.iter().sum::<f64>()
-                        / e.level_sn_ratios.len() as f64;
+                    let factor_mean =
+                        e.level_sn_ratios.iter().sum::<f64>() / e.level_sn_ratios.len() as f64;
                     e.level_sn_ratios[e.optimal_level] - factor_mean
                 })
                 .sum::<f64>();

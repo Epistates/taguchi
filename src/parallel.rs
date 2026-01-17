@@ -29,7 +29,7 @@ use rayon::prelude::*;
 use crate::construct::Constructor;
 use crate::error::{Error, Result};
 use crate::gf::DynamicGf;
-use crate::oa::{OAParams, OA};
+use crate::oa::{OA, OAParams};
 use crate::utils::{factor_prime_power, is_prime_power};
 
 /// Parallel Bose construction for strength-2 orthogonal arrays.

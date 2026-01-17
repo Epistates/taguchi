@@ -141,7 +141,11 @@ use crate::oa::OA;
 /// # #[cfg(not(feature = "doe"))]
 /// # fn main() {}
 /// ```
-pub fn analyze(oa: &OA, response_data: &[Vec<f64>], config: &AnalysisConfig) -> Result<DOEAnalysis> {
+pub fn analyze(
+    oa: &OA,
+    response_data: &[Vec<f64>],
+    config: &AnalysisConfig,
+) -> Result<DOEAnalysis> {
     // Validate inputs
     if response_data.is_empty() {
         return Err(Error::invalid_params("Response data is empty"));
@@ -333,12 +337,7 @@ mod tests {
             .build()
             .unwrap();
 
-        let response_data = vec![
-            vec![100.0],
-            vec![50.0],
-            vec![80.0],
-            vec![30.0],
-        ];
+        let response_data = vec![vec![100.0], vec![50.0], vec![80.0], vec![30.0]];
 
         let config = AnalysisConfig {
             optimization_type: OptimizationType::SmallerIsBetter,
@@ -362,10 +361,10 @@ mod tests {
             .unwrap();
 
         let response_data = vec![
-            vec![95.0, 96.0, 94.0],  // Close to target
-            vec![80.0, 85.0, 75.0],  // High variance
-            vec![98.0, 99.0, 97.0],  // Close to target
-            vec![60.0, 70.0, 80.0],  // Very high variance
+            vec![95.0, 96.0, 94.0], // Close to target
+            vec![80.0, 85.0, 75.0], // High variance
+            vec![98.0, 99.0, 97.0], // Close to target
+            vec![60.0, 70.0, 80.0], // Very high variance
         ];
 
         let config = AnalysisConfig {

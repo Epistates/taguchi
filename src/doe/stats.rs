@@ -105,8 +105,8 @@ pub fn regularized_incomplete_beta(x: f64, a: f64, b: f64) -> f64 {
         f *= d * c;
 
         // Odd step: a_{2m+1}
-        let numerator = -((a + m_f) * (a + b + m_f) * x)
-            / ((a + 2.0 * m_f) * (a + 2.0 * m_f + 1.0));
+        let numerator =
+            -((a + m_f) * (a + b + m_f) * x) / ((a + 2.0 * m_f) * (a + 2.0 * m_f + 1.0));
 
         d = 1.0 + numerator * d;
         if d.abs() < EPSILON {
@@ -379,8 +379,8 @@ mod tests {
         let x = 0.3;
         let a = 2.0;
         let b = 3.0;
-        let result = regularized_incomplete_beta(x, a, b)
-            + regularized_incomplete_beta(1.0 - x, b, a);
+        let result =
+            regularized_incomplete_beta(x, a, b) + regularized_incomplete_beta(1.0 - x, b, a);
         assert!((result - 1.0).abs() < 1e-8);
     }
 

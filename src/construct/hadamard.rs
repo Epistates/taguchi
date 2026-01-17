@@ -27,7 +27,7 @@ use ndarray::Array2;
 
 use super::Constructor;
 use crate::error::{Error, Result};
-use crate::oa::{OAParams, OA};
+use crate::oa::{OA, OAParams};
 
 /// Sylvester-Hadamard construction for strength-2 binary orthogonal arrays.
 ///

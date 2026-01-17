@@ -6,7 +6,7 @@
 mod primality;
 
 pub use primality::{
-    factor_prime_power, is_prime, is_prime_power, smallest_prime_factor, PrimePowerFactorization,
+    PrimePowerFactorization, factor_prime_power, is_prime, is_prime_power, smallest_prime_factor,
 };
 
 /// Compute binomial coefficient C(n, k) = n! / (k! * (n-k)!)

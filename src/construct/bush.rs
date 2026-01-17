@@ -42,7 +42,7 @@ use ndarray::Array2;
 use super::Constructor;
 use crate::error::{Error, Result};
 use crate::gf::DynamicGf;
-use crate::oa::{OAParams, OA};
+use crate::oa::{OA, OAParams};
 use crate::utils::is_prime_power;
 
 /// Bush construction for strength-t orthogonal arrays.

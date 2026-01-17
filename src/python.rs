@@ -6,8 +6,8 @@
 use pyo3::prelude::*;
 use pyo3::types::PyList;
 
-use crate::oa::OA;
 use crate::OABuilder;
+use crate::oa::OA;
 
 /// Python wrapper for OAParams
 #[pyclass(name = "OAParams")]
