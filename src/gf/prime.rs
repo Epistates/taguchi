@@ -13,14 +13,15 @@ use std::fmt;
 ///
 /// # Example
 ///
-/// ```ignore
+/// ```
 /// use taguchi::gf::GfPrime;
 ///
 /// type GF7 = GfPrime<7>;
 ///
 /// let a = GF7::from_value(3);
 /// let b = GF7::from_value(5);
-/// let sum = a.add(b); // 3 + 5 = 8 ≡ 1 (mod 7)
+/// let sum = a + b; // 3 + 5 = 8 ≡ 1 (mod 7)
+/// assert_eq!(sum.value(), 1);
 /// ```
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 #[repr(transparent)]
