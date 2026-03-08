@@ -4,7 +4,7 @@
 [![Documentation](https://docs.rs/taguchi/badge.svg)](https://docs.rs/taguchi)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
 
-**Taguchi** is a robust, world-class Rust library for constructing and analyzing orthogonal arrays (OAs). Orthogonal arrays are fundamental to Design of Experiments (DOE), Monte Carlo simulation, combinatorial software testing (OATS), and quasi-random sampling.
+**Taguchi** is a Rust library for constructing and analyzing orthogonal arrays (OAs). Orthogonal arrays are fundamental to Design of Experiments (DOE), Monte Carlo simulation, combinatorial software testing (OATS), and quasi-random sampling.
 
 ## Key Features
 
